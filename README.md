@@ -1,6 +1,6 @@
 # VizDisk
 **A Free macOS Disk Space Visualizer and Analyzer**
-
+# [Download](https://sheafdynamics.github.io/vizdisk/)
 VizDisk is a modern, web-based disk usage analyzer for macOS that provides interactive treemap visualizations of your storage usage. Think WizTree for Windows, but designed specifically for macOS with a clean, native interface.
 
 ![VizDisk Interface](https://img.shields.io/badge/Platform-macOS-blue) ![Python](https://img.shields.io/badge/Python-3.8+-green) ![License](https://img.shields.io/badge/License-MIT-orange)

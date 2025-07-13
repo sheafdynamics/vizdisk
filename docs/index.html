@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VizDisk - Free macOS Disk Space Visualizer</title>
+    <meta name="description" content="VizDisk is a free, open-source disk space analyzer for macOS with interactive treemap visualizations. Find large files and clean up storage easily.">
+    <meta name="keywords" content="macOS, disk space, storage analyzer, treemap, visualization, free, open source">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="VizDisk - Free macOS Disk Space Visualizer">
+    <meta property="og:description" content="Interactive treemap visualizations to analyze disk usage on macOS. Free and open source.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sheafdynamics.github.io/vizdisk/">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💿</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #343d75;
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: #343d75;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 80px 0;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+        
+        .btn-primary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Screenshots */
+        .screenshots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .screenshot {
+            background: white;
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        
+        .screenshot:hover {
+            transform: translateY(-10px);
+        }
+        
+        .screenshot img {
+            width: 100%;
+            border-radius: 12px;
+            display: block;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background: white;
+        }
+        
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #2d3748;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 30px;
+            border-radius: 16px;
+            background: #f8fafc;
+            transition: transform 0.2s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .feature p {
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        /* Installation Section */
+        .installation {
+            padding: 100px 0;
+            background: #f8fafc;
+        }
+        
+        .installation h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 60px;
+            color: #2d3748;
+        }
+        
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .step {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            line-height: 40px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .step h3 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #a0aec0;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'SF Mono', Monaco, monospace;
+            margin: 30px 0;
+            overflow-x: auto;
+        }
+        
+        /* Footer */
+        footer {
+            background: #2d3748;
+            color: white;
+            padding: 60px 0 30px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        
+        .footer-section a {
+            color: #a0aec0;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.2s;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #4a5568;
+            padding-top: 30px;
+            color: #a0aec0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .screenshots {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">
+                💿 VizDisk
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#installation">Install</a></li>
+                <li><a href="https://github.com/sheafdynamics/vizdisk">GitHub</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>VizDisk</h1>
+                <p class="subtitle">A Free macOS Disk Space Visualizer and Analyzer</p>
+                <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 40px;">
+                    Interactive treemap visualizations to find large files and clean up storage on macOS. 
+                </p>
+                
+                <div class="cta-buttons">
+                    <a href="https://github.com/sheafdynamics/vizdisk/releases" class="btn btn-primary">
+                        ⬇ Download Free
+                    </a>
+                    <a href="https://github.com/sheafdynamics/vizdisk" class="btn btn-secondary">
+                        ⭐ View on GitHub
+                    </a>
+                </div>
+                
+                <div class="screenshots">
+                    <div class="screenshot">
+                        <img src="screenshot1.png" alt="VizDisk treemap visualization showing file structure">
+                    </div>
+                    <div class="screenshot">
+                        <img src="screenshot2.png" alt="VizDisk details view with largest files and directories">
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <a href="demo.html" style="color: rgba(255,255,255,0.9); text-decoration: underline;">
+                        View more screenshots and features →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2>Powerful Features</h2>
+                <div class="features-grid">
+                    <div class="feature">
+                        <div class="feature-icon">📊</div>
+                        <h3>Interactive Treemap</h3>
+                        <p>Navigate through your storage usage with zoom, hover, and click interactions. See exactly where your disk space is being used.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Real-time Scanning</h3>
+                        <p>Live progress updates with detailed status messages during filesystem analysis. Watch as it discovers your largest files.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Smart Discovery</h3>
+                        <p>Automatically discovers and suggests common directories like Downloads, Documents, Desktop, and more.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">💾</div>
+                        <h3>Export Reports</h3>
+                        <p>Generate standalone HTML reports that work offline. Share analysis results with fully interactive charts.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">🔍</div>
+                        <h3>Search & Filter</h3>
+                        <p>Find specific files and folders instantly with the built-in search filter. Navigate large directory trees easily.</p>
+                    </div>
+                    
+                    <div class="feature">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Safe & Secure</h3>
+                        <p>Read-only operations that never modify files. Gracefully handles permission restrictions without crashing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="installation" class="installation">
+            <div class="container">
+                <h2>Quick Installation</h2>
+                
+                <div class="install-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Install Xcode Tools</h3>
+                        <p>Run the command below to install required development tools</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Download VizDisk</h3>
+                        <p>Clone or download the repository from GitHub</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Run Setup</h3>
+                        <p>Execute the launch script to install and start the application</p>
+                    </div>
+                </div>
+                
+                <div class="code-block">
+# Install Xcode Command Line Tools
+xcode-select --install
+
+# Download VizDisk
+git clone https://github.com/sheafdynamics/vizdisk.git
+cd vizdisk
+
+# Make executable and run
+chmod +x launch_macos.sh
+./launch_macos.sh
+                </div>
+                
+                <p style="text-align: center; margin-top: 30px; color: #718096;">
+                    The app will automatically open in your browser at <code>http://localhost:8080</code>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>VizDisk</h3>
+                    <p style="color: #a0aec0;">Free and open source disk space analyzer for macOS with beautiful treemap visualizations.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Links</h3>
+                    <a href="https://github.com/sheafdynamics/vizdisk">GitHub Repository</a>
+                    <a href="https://github.com/sheafdynamics/vizdisk/releases">Download Latest</a>
+                    <a href="https://github.com/sheafdynamics/vizdisk/issues">Report Issues</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <a href="https://github.com/sheafdynamics/vizdisk/wiki">Documentation</a>
+                    <a href="https://github.com/sheafdynamics/vizdisk/discussions">Community</a>
+                    <a href="mailto:sheafdynamics@gmail.com">Contact</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 VizDisk. Released under the MIT License.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

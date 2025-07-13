@@ -1,0 +1,38 @@
+# GitHub Pages configuration for VizDisk
+title: VizDisk
+description: A Free macOS Disk Space Visualizer and Analyzer
+baseurl: "/vizdisk"
+url: "https://sheafdynamics.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO settings
+author: VizDisk Team
+twitter:
+  username: vizdisk
+  card: summary_large_image
+
+social:
+  name: VizDisk
+  links:
+    - https://github.com/sheafdynamics/vizdisk
+
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/

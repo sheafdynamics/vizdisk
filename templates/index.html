@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VizDisk - Free macOS Disk Space Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <i data-feather="hard-drive"></i>
+                VizDisk
+            </h1>
+            <p>A Free macOS Disk Space Visualizer and Analyzer</p>
+        </header>
+
+        <div class="controls">
+            <div class="scan-controls">
+                <div class="input-group">
+                    <label for="scan-path">Scan Path:</label>
+                    <select id="scan-path">
+                        <option value="/tmp/test_storage">Test Storage (Safe)</option>
+                        <option value="/Users/$USER" selected>Home Directory</option>
+                        <option value="/Users/$USER/Downloads">Downloads</option>
+                        <option value="/Users/$USER/Documents">Documents</option>
+                        <option value="/Users/$USER/Desktop">Desktop</option>
+                        <option value="/Users/$USER/Pictures">Pictures</option>
+                        <option value="/Users/$USER/Music">Music</option>
+                        <option value="/Users/$USER/Movies">Movies</option>
+                        <option value="/Users/$USER/Library">User Library</option>
+                        <option value="/Applications">Applications</option>
+                        <option value="/usr/local">Local Programs</option>
+                        <option value="/opt">Optional Software</option>
+                        <option value="/home">Home Folders (if exists)</option>
+                        <option value="custom">Custom Path...</option>
+                    </select>
+                    <input type="text" id="custom-path" style="display: none; margin-top: 8px;" placeholder="Enter custom path">
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        Example: /Users/john/Downloads
+                    </small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="exclude-dirs">Exclude Directories (comma-separated):</label>
+                    <input type="text" id="exclude-dirs" placeholder="Enter comma-separated paths (e.g., /System, /private, /Applications)">
+                    <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                        Example: /System, /private, /Applications
+                    </small>
+                </div>
+                
+                <div class="scan-button-row">
+                    <button id="start-scan" class="btn btn-primary">
+                        <i data-feather="search"></i>
+                        Start Scan
+                    </button>
+                    
+                    <button id="stop-scan" class="btn btn-secondary" disabled>
+                        <i data-feather="stop-circle"></i>
+                        Stop Scan
+                    </button>
+                </div>
+                
+                <button id="export-results" class="btn btn-export btn-full-width" disabled>
+                    <i data-feather="download"></i>
+                    Export Results
+                </button>
+            </div>
+        </div>
+
+        <div class="progress-section" id="progress-section" style="display: none;">
+            <div class="progress-info">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progress-percentage">0%</span>
+                    <span id="progress-status">Initializing...</span>
+                </div>
+                <div class="current-path" id="current-path"></div>
+            </div>
+        </div>
+
+        <div class="results-section" id="results-section" style="display: none;">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="treemap">
+                    <i data-feather="map"></i>
+                    Treemap
+                </button>
+                <button class="tab-btn" data-tab="details">
+                    <i data-feather="list"></i>
+                    Details
+                </button>
+            </div>
+
+            <div class="tab-content active" id="treemap-tab">
+                <div class="treemap-controls">
+                    <button id="home-button" class="btn btn-small" style="display: none;">
+                        <i data-feather="home"></i>
+                        Home
+                    </button>
+                    <div class="search-container" style="display: none;">
+                        <input type="text" id="search-filter" placeholder="Search files and folders...">
+                        <button id="clear-search" class="btn btn-small">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="visualization-container">
+                    <div id="treemap-plot"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="details-tab">
+                <div class="details-container">
+                    <div class="summary-cards">
+                        <div class="card">
+                            <div class="card-header">
+                                <i data-feather="folder"></i>
+                                Total Size
+                            </div>
+                            <div class="card-value" id="total-size">-</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <i data-feather="file"></i>
+                                File Count
+                            </div>
+                            <div class="card-value" id="file-count">-</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <i data-feather="folder"></i>
+                                Directory Count
+                            </div>
+                            <div class="card-value" id="dir-count">-</div>
+                        </div>
+                    </div>
+
+                    <div class="top-items">
+                        <div class="top-section">
+                            <h3>
+                                <i data-feather="trending-up"></i>
+                                Largest Directories
+                            </h3>
+                            <div class="items-list" id="top-directories"></div>
+                        </div>
+
+                        <div class="top-section">
+                            <h3>
+                                <i data-feather="file-text"></i>
+                                Largest Files
+                            </h3>
+                            <div class="items-list" id="top-files"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error-section" id="error-section" style="display: none;">
+            <div class="error-message">
+                <i data-feather="alert-circle"></i>
+                <span id="error-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Initialize feather icons
+        feather.replace();
+    </script>
+</body>
+</html>

@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -25,17 +25,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Optional: bump to the latest configure-pages
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: 'true'    # automatically turn on Pages if needed :contentReference[oaicite:0]{index=0}
 
       - name: Upload artifact
-        # bump from v2 → v3
         uses: actions/upload-pages-artifact@v3
         with:
           path: './docs'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        # bump from v3 → v4
         uses: actions/deploy-pages@v4
